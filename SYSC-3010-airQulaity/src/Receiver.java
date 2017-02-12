@@ -1,5 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 
 import java.io.DataInputStream;
@@ -14,12 +16,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class Receiver extends Thread {
+public class Receiver extends Thread implements ActionListener{
 	
 	private ServerSocket connection;
 	private ArrayList<Integer> list;
@@ -28,11 +31,11 @@ public class Receiver extends Thread {
 	private JFrame frame;
 	private JScrollPane scrollPane;
 	private JPanel textPanel, controlPanel;
-	private JButton button;
+	private JButton sendToApp, sendToDatabase;
 	
 	public Receiver(){
 		frame = new JFrame("Receiver");
-		frame.setSize(250,500);
+		frame.setSize(350,500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//list = new ArrayList<JButton>();
 		frame.getContentPane().setLayout(new BorderLayout());
@@ -48,8 +51,14 @@ public class Receiver extends Thread {
 		frame.getContentPane().add(textPanel, BorderLayout.CENTER) ;
 		
 		controlPanel = new JPanel();
-		button = new JButton("press");
-		controlPanel.add(button);
+		
+		sendToApp = new JButton("Send Data to App");
+		sendToApp.addActionListener(this);
+		controlPanel.add(sendToApp);
+		
+		sendToDatabase= new JButton("send Data to Databse");
+		controlPanel.add(sendToDatabase);
+		sendToDatabase.addActionListener(this);
 		frame.getContentPane().add(controlPanel, BorderLayout.SOUTH) ;
 		frame.setVisible(true);
 	}
@@ -96,6 +105,19 @@ public class Receiver extends Thread {
 	public static void main(String [] args) {
 	         Thread t = new Receiver();
 	         t.start();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource().equals(sendToApp)){
+			JOptionPane.showMessageDialog (null, "Sending data to app.....", "Title", JOptionPane.INFORMATION_MESSAGE);
+			System.out.println("app" );
+		}
+		else if (e.getSource().equals(sendToDatabase)){
+			JOptionPane.showMessageDialog (null, "Sending data to Database.....", "Title", JOptionPane.INFORMATION_MESSAGE);
+			System.out.println("databse" );
+		}
+		
 	}
 	
 	
