@@ -42,7 +42,7 @@ public class Server extends Thread{
 	
 	private DatagramSocket serverSocket;
 	private byte[] receiveData;
-	private static final int PORT = 6799;
+	private static final int PORT = 6777;
 	private int count;
 	private InetAddress IPAddress;
 	private int port;
@@ -64,16 +64,24 @@ public class Server extends Thread{
 			e.printStackTrace();
 		}
 		
+		if(port == 6777){
+			initGUI();
+		}else{
+			System.out.println("\n To Android");
+		}
 		
 		
-		frame = new JFrame("Receiver");
+	}
+	
+	public void initGUI(){
+		frame = new JFrame("Server");
 		frame.setSize(350,500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		//list = new ArrayList<JButton>();
 		frame.getContentPane().setLayout(new BorderLayout());
 		
 		textPanel = new JPanel();
-		field = new JTextField("Receiver ");
+		field = new JTextField("Values frome the sensor ");
 		//textPanel.add(field);
 		frame.getContentPane().add(field, BorderLayout.NORTH) ;
 		area = new JTextArea(25,15);
@@ -153,7 +161,24 @@ public class Server extends Thread{
 	 * 
 	 * @param sendData
 	 */
-	public void sendPacket(byte[] sendData, DatagramSocket clientSocket, int port, InetAddress ip){
+	public void sendPacket(byte[] sendData, int port, String ipString){
+	
+		InetAddress ip = null;
+		DatagramSocket clientSocket = null;
+		try {
+			ip = InetAddress.getByName(ipString);
+			try {
+				clientSocket = new DatagramSocket();
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (UnknownHostException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+		System.out.println("Just connected to " + clientSocket.getRemoteSocketAddress());
 		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ip, port);
 	     try {
 			clientSocket.send(sendPacket);
@@ -164,11 +189,19 @@ public class Server extends Thread{
 	}
 	
 	public void run(){
-	
+		Server server = null;
+		try {
+			server = new Server(6799);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
         while(true){
               receivePacket = new DatagramPacket(this.receiveData, this.receiveData.length);                 
               try {
 				serverSocket.receive(receivePacket);
+				
               } catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -178,6 +211,7 @@ public class Server extends Thread{
               this.count++;
               
               int[] ints = bytesToInts(receivePacket.getData());
+              server.sendPacket(receivePacket.getData(), server.port, "172.17.79.92");
               System.out.println(ints[0]);
 			  area.append(ints[0] + "ppm \n");
               if(!serverSocket.isBound()){
@@ -203,7 +237,7 @@ public class Server extends Thread{
 		DatagramSocket clientSocket = new DatagramSocket(port, ip);
 		System.out.println("Just connected to " + clientSocket.getRemoteSocketAddress());
 		//netAddress.getByName("localhost");
-		sendPacket(array, clientSocket, port, ip);
+		//sendPacket(array, clientSocket, port, ip);
 			
 	}
 /*

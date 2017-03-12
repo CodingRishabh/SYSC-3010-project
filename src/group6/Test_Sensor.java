@@ -40,7 +40,7 @@ public class Test_Sensor {
 
 	int sliderValue = 400;
 	
-	private static final int PORT = 6799;
+	private static final int PORT = 6777;
 	private DatagramSocket clientSocket;
 	private InetAddress IPAddress;
 	int count;
@@ -56,7 +56,7 @@ public class Test_Sensor {
 		
 		try {
 			clientSocket = new DatagramSocket();
-			IPAddress = InetAddress.getByName("172.17.48.38");
+			IPAddress = InetAddress.getByName("localhost");
 			
 			
 		} catch (SocketException e) {

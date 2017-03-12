@@ -31,11 +31,10 @@ private int count;
 		server =new Server(port);
 		this.receiveData = new byte[8];
 		this.count = 0;
-		//serverSocket = new DatagramSocket(port);
 	}
 	
 	@Test
-	public void ServerTestConstructor1(){
+	public void ServerTestConstructor(){
 		assertArrayEquals("both array should be equal and empty", receiveData,server.getData());
 		assertEquals("Passed port should be equal to orignal port", port, server.getPort());
 		assertEquals("count of packets should be equal to 0", count, server.getCount());
@@ -74,11 +73,8 @@ private int count;
 		DatagramSocket clientSocket = null;
 		try {
 			clientSocket = new DatagramSocket();
-			server.sendPacket(newData, clientSocket, 6799, InetAddress.getByName("localhost"));
+			server.sendPacket(newData, 6799, "localhost");
 		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
