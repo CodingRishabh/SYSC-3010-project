@@ -27,7 +27,7 @@ private int count;
 
 	@Before
 	public void setUp() throws Exception {
-		port = 6666;
+		port = 6799;
 		server =new Server(port);
 		this.receiveData = new byte[8];
 		this.count = 0;
