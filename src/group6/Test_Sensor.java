@@ -39,14 +39,15 @@ public class Test_Sensor {
 	
 
 	int sliderValue = 400;
-	
 	private static final int PORT = 6777;
 	private DatagramSocket clientSocket;
 	private InetAddress IPAddress;
 	int count;
+	byte[] receiveData;
+	DatagramPacket receivePacket;
 	
 	
-	public Test_Sensor() throws IOException, IOException{
+	public Test_Sensor() throws IOException{
 		//clientSocket = new Socket("172.17.43.32", port);
 		//clientSocket = new Socket("172.17.67.5", port);
 		//clientSocket = new Socket("localhost", PORT);
@@ -57,8 +58,8 @@ public class Test_Sensor {
 		try {
 			clientSocket = new DatagramSocket();
 			IPAddress = InetAddress.getByName("localhost");
-			
-			
+			receiveData = new byte[512];
+
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,7 +73,7 @@ public class Test_Sensor {
 	}
 	
 	private void prepareGUI(){
-	      mainFrame = new JFrame("Java Swing Examples");
+	      mainFrame = new JFrame("Test_Sensor");
 	      mainFrame.setSize(400,400);
 	      mainFrame.setLayout(new GridLayout(5, 1));
 	      
@@ -83,9 +84,7 @@ public class Test_Sensor {
 	      });
 	      
 	      dict.put(1, new JLabel("Low"));
-	      dict.put(2, new JLabel("hi"));
-	      
-
+	      dict.put(2, new JLabel("hi"));	      
 	      headerLabel = new JLabel("", JLabel.CENTER);        
 	      statusLabel = new JLabel("",JLabel.CENTER);    
 	      statusLabel.setSize(350,100);
@@ -99,6 +98,7 @@ public class Test_Sensor {
 
 	      mainFrame.setVisible(true);  
 	   }
+	
 	   private void showSliderDemo(){
 	      headerLabel.setText("CO2 Concentration in (ppm)"); 
 	      statusLabel.setText("Value : " + sliderValue); 
@@ -117,71 +117,57 @@ public class Test_Sensor {
 	      mainFrame.setVisible(true);     
 	   } 
 	   
-	   
-	   /**
-		 * 
-		 * @param ints
-		 * @return
-		 */
-		public byte[] intsToBytes(int[] ints) {
-		    ByteBuffer bb = ByteBuffer.allocate(ints.length * 4);
-		    IntBuffer ib = bb.asIntBuffer();
-		    for (int i : ints) ib.put(i);
-		    return bb.array();
+	   public byte[] getData(){
+			return this.receiveData;
 		}
-
-		/**
-		 * 
-		 * @param right
-		 * @param left
-		 * @return
-		 */
-		public byte[] createPacket(int sata){
+	   
+	  
+		public void sendPacket(byte[] sendData) throws IOException{
+			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT);
+			clientSocket.send(sendPacket);
+		
+		}
+		public void receivePacket() throws IOException{
 			
-			int[] data = new int[1];
-			data[0] = sata;
-
-			byte[] newData = intsToBytes(data);
-			
-			return newData;
+			receivePacket = new DatagramPacket(receiveData, receiveData.length);	
+			clientSocket.receive(receivePacket);
 		}
 		
-		/**
-		 * 
-		 * @param sendData
-		 */
-		public void sendPacket(byte[] sendData, DatagramSocket clientSocket){
-			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT);
-		     try {
-				clientSocket.send(sendPacket);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+		private boolean processPacket(DatagramPacket packet){
+			String message = new String(packet.getData());
+			if(message.startsWith("ok")){
+				return true;
 			}
+			return false;
 		}
 
-	public static void main(String args[]) throws IOException, InterruptedException{
-		System.out.println("send a message" );
-		 
+		public static void main(String args[]) throws IOException, InterruptedException{
 		  Test_Sensor t = new Test_Sensor();
 		  t.showSliderDemo();
-		  System.out.println("Connected to the server" );
-		  while(true){
-			  //c.clientSocket.setReuseAddress(true);
-			  //c.clientSocket.setSoTimeout(1000);
-			  byte[] sendData = t.createPacket(t.getInt(t.sliderValue));
-			 
-				if(!t.clientSocket.isClosed()){
-					t.sendPacket(sendData, t.clientSocket);
-				}else{
-					System.out.println("Server has closed its connection" );
-					t.clientSocket.close();
-					break;
-				}
-			  
-			
+		  String conn = "con nect";
+		  System.out.println("sending a connection request" );
+		  t.sendPacket(conn.getBytes());
+		  
+		  System.out.println("Waiting for connection" );
+		  t.receivePacket();
+		  if(t.processPacket(t.receivePacket)){
+			  System.out.println("Connection made" );
+			  while(true){
+				  //c.clientSocket.setReuseAddress(true);
+				  //c.clientSocket.setSoTimeout(1000);
+				  String message = t.getInt(t.sliderValue) + "";
+				  System.out.println(message);
+				  byte[] sendData = message.getBytes();
+					if(!t.clientSocket.isClosed()){
+						DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, t.receivePacket.getAddress(), t.receivePacket.getPort());
+						t.clientSocket.send(sendPacket);
+					}else{
+						System.out.println("Server has closed its connection" );
+						t.clientSocket.close();
+						break;
+					}
+			  }
 		  }
-
 	}
 	
 	public int getInt(int value) throws InterruptedException{
@@ -189,6 +175,40 @@ public class Test_Sensor {
 		return ThreadLocalRandom.current().nextInt(value -3, value + 3);
 		
 	}
+	
+	 /**
+	 * 
+	 * @param ints
+	 * @return
+	 */
+	public byte[] intsToBytes(int[] ints) {
+	    ByteBuffer bb = ByteBuffer.allocate(ints.length * 4);
+	    IntBuffer ib = bb.asIntBuffer();
+	    for (int i : ints) ib.put(i);
+	    return bb.array();
+	}
+
+	/**
+	 * 
+	 * @param right
+	 * @param left
+	 * @return
+	 */
+	public byte[] createPacket(int sata){
+		
+		int[] data = new int[1];
+		data[0] = sata;
+
+		byte[] newData = intsToBytes(data);
+		
+		return newData;
+	}
+	
+	/**
+	 * 
+	 * @param sendData
+	 * @throws IOException 
+	 */
 
 	
 }
