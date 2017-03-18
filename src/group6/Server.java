@@ -59,6 +59,7 @@ public class Server{
 		this.count = 0;
 		clientSocket = new DatagramSocket();
 		message = "";
+		receivePacket = new DatagramPacket(receiveData, receiveData.length);	
 
 		try {
 			serverSocket = new DatagramSocket(port);
@@ -94,7 +95,7 @@ public class Server{
 
 		while(true){
     		
-    		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);	
+    		receivePacket = new DatagramPacket(receiveData, receiveData.length);	
 			serverSocket.receive(receivePacket);
 			String message = new String(receivePacket.getData());
 		

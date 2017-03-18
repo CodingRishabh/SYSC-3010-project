@@ -31,16 +31,17 @@ private static final int PORT = 6777;
 	@Before
 	public void setUp() throws Exception {
 		server =new Server();
+		//server.runServer();
 		
 	
 	}
 	
 	@Test
 	public void ServerTestConstructor() throws IOException{
-		Server server2 = new Server(6788);
-		assertArrayEquals("both array should be equal and empty", server2.getData(),server.getData());
-		assertEquals("Passed port should be equal to orignal port", server2.getPort(), server.getPort());
-		assertEquals("count of packets should be equal to 0", server2.getCount(), server.getCount());
+		byte[] bytes = new byte[512];
+		assertArrayEquals("both array should be equal and empty", bytes,server.getData());
+		assertEquals("Passed port should be equal to orignal port", PORT, server.getPort());
+		assertEquals("count of packets should be equal to 0", 0, server.getCount());
 	}
 	
 	@Test
@@ -50,15 +51,12 @@ private static final int PORT = 6777;
 	}
 	
 	@Test
-	public void TestRunServer() throws InterruptedException{
-		try {
-			//Test_Sensor t = new Test_Sensor();
-			String[] args = {};
-			Test_Sensor.main(args);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void TestRunServer() throws InterruptedException, IOException{
+		String s = "con nect";
+		//server.runServer();
+		Test_Sensor t = new Test_Sensor();
+		t.sendPacket(s.getBytes());
+		
 		assertEquals("check if server thread was created", 1, server.getThreadList().size() );
 		
 	}
@@ -83,6 +81,7 @@ private static final int PORT = 6777;
 	@Test
 	public void TestSendPacket() throws IOException {
 		String s = "con nect";
+		//server.runServer();
 		
 		Test_Sensor t = new Test_Sensor();
 		t.sendPacket(s.getBytes());
@@ -91,6 +90,7 @@ private static final int PORT = 6777;
 		//int[] ints = server.bytesToInts(server.getPacket().getData());
 		assertEquals("Confirms when the connection is made","ok done", message);
 	}
+	
 	
 	@After
 	public void tearDown() throws Exception {

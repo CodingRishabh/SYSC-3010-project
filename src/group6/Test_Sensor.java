@@ -51,8 +51,9 @@ public class Test_Sensor {
 		//clientSocket = new Socket("172.17.43.32", port);
 		//clientSocket = new Socket("172.17.67.5", port);
 		//clientSocket = new Socket("localhost", PORT);
-		//old phone 172.17.79.92
+		//old phone 127.17.88.251
 		//good phone 172.17.48.38
+		//use broad cast ip in computer lab linux machine not ethernet ip
 		System.out.println("Connecting to " + "localhost" + " on port " + PORT);
 		
 		try {
