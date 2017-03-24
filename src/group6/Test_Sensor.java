@@ -30,23 +30,25 @@ import javax.swing.event.*;
 
 public class Test_Sensor {
 	
-	
 	private JFrame mainFrame;
 	private JLabel headerLabel;
 	private JLabel statusLabel;
 	private JPanel controlPanel;
-	private Hashtable<Integer, JLabel> dict;
+	private JSlider slider;
+	private int sliderValue = 400; //display slider value on GUI
 	
-
-	int sliderValue = 400;
-	private static final int PORT = 6777;
-	private DatagramSocket clientSocket;
+	private static final int PORT = 6777;// port of the server
+	private DatagramSocket clientSocket;// our socket
 	private InetAddress IPAddress;
-	int count;
-	byte[] receiveData;
-	DatagramPacket receivePacket;
+	byte[] receiveData; // data from UDP packet received here
+	private DatagramPacket receivePacket;
 	
 	
+	
+	/**
+	 * Initialize our data-gram socket, IP address and start the GUI
+	 * @throws IOException
+	 */
 	public Test_Sensor() throws IOException{
 		//clientSocket = new Socket("172.17.43.32", port);
 		//clientSocket = new Socket("172.17.67.5", port);
@@ -55,7 +57,6 @@ public class Test_Sensor {
 		//good phone 172.17.48.38
 		//use broad cast ip in computer lab linux machine not ethernet ip
 		System.out.println("Connecting to " + "localhost" + " on port " + PORT);
-		
 		try {
 			clientSocket = new DatagramSocket();
 			IPAddress = InetAddress.getByName("localhost");
@@ -68,14 +69,16 @@ public class Test_Sensor {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		dict = new Hashtable<Integer, JLabel>();
 		prepareGUI();
 	}
 	
+	
+	/**
+	 * Create a GUI and initialize all the GUI variables
+	 */
 	private void prepareGUI(){
 	      mainFrame = new JFrame("Test_Sensor");
-	      mainFrame.setSize(400,400);
+	      mainFrame.setSize(300,300);
 	      mainFrame.setLayout(new GridLayout(5, 1));
 	      
 	      mainFrame.addWindowListener(new WindowAdapter() {
@@ -84,11 +87,10 @@ public class Test_Sensor {
 	         }        
 	      });
 	      
-	      dict.put(1, new JLabel("Low"));
-	      dict.put(2, new JLabel("hi"));	      
-	      headerLabel = new JLabel("", JLabel.CENTER);        
-	      statusLabel = new JLabel("",JLabel.CENTER);    
-	      statusLabel.setSize(350,100);
+	            
+	      headerLabel = new JLabel("CO2 Concentration in (ppm)", JLabel.CENTER);        
+	      statusLabel = new JLabel("Value : " + sliderValue,JLabel.CENTER);    
+	      statusLabel.setSize(350,300);
 
 	      controlPanel = new JPanel();
 	      controlPanel.setLayout(new FlowLayout());
@@ -96,21 +98,30 @@ public class Test_Sensor {
 	      mainFrame.add(headerLabel);
 	      mainFrame.add(controlPanel);
 	      mainFrame.add(statusLabel);
-
+	      
 	      mainFrame.setVisible(true);  
 	   }
 	
+		/**
+		 * Create a JSlider that ranges from 0 - 1000
+		 */
 	   private void showSliderDemo(){
-	      headerLabel.setText("CO2 Concentration in (ppm)"); 
-	      statusLabel.setText("Value : " + sliderValue); 
-	      JSlider slider = new JSlider(JSlider.HORIZONTAL,0,1000,400);;
-	      slider.setLabelTable(dict);
+	      slider = new JSlider(JSlider.HORIZONTAL,0,1000,400);;
+	      slider.setSize(20,10);
+	      
+	      slider.setMinorTickSpacing(100);
+	      slider.setMajorTickSpacing(500);
+	      slider.setPaintTicks(true);
+	      slider.setPaintLabels(true);
+
+	      // standard numeric labels for the slider...
+	      slider.setLabelTable(slider.createStandardLabels(200)); 
 	      
 	      
 	      slider.addChangeListener(new ChangeListener() {
 	         public void stateChanged(ChangeEvent e) {
 	        	sliderValue = ((JSlider)e.getSource()).getValue();
-	            statusLabel.setText("Value : " + sliderValue);
+	            statusLabel.setText("Value : " + sliderValue); // match the slider label with current slider value
 	   
 	         }
 	      });
@@ -123,17 +134,31 @@ public class Test_Sensor {
 		}
 	   
 	  
+	   /**
+	    *  takes in data and creates a data-gram packet and sends it to destination
+	    * @param sendData data to be sent
+	    * @throws IOException
+	    */
 		public void sendPacket(byte[] sendData) throws IOException{
 			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT);
 			clientSocket.send(sendPacket);
 		
 		}
+		/**
+		 * creates a packet the excepts data from the server
+		 * @throws IOException
+		 */
 		public void receivePacket() throws IOException{
-			
 			receivePacket = new DatagramPacket(receiveData, receiveData.length);	
 			clientSocket.receive(receivePacket);
 		}
 		
+		/**
+		 * If the packet contains "ok", the server has approved
+		 * our connection request
+		 * @param packet sent by the server
+		 * @return
+		 */
 		private boolean processPacket(DatagramPacket packet){
 			String message = new String(packet.getData());
 			if(message.startsWith("ok")){
@@ -145,17 +170,17 @@ public class Test_Sensor {
 		public static void main(String args[]) throws IOException, InterruptedException{
 		  Test_Sensor t = new Test_Sensor();
 		  t.showSliderDemo();
+		  
 		  String conn = "con nect";
 		  System.out.println("sending a connection request" );
 		  t.sendPacket(conn.getBytes());
-		  
 		  System.out.println("Waiting for connection" );
 		  t.receivePacket();
+		  
+		  // if our connection request has been approved
 		  if(t.processPacket(t.receivePacket)){
 			  System.out.println("Connection made" );
-			  while(true){
-				  //c.clientSocket.setReuseAddress(true);
-				  //c.clientSocket.setSoTimeout(1000);
+			  while(true){ // Take the current slider value and send it to the server to simulate a sensor
 				  String message = t.getInt(t.sliderValue) + "";
 				  System.out.println(message);
 				  byte[] sendData = message.getBytes();
@@ -171,45 +196,16 @@ public class Test_Sensor {
 		  }
 	}
 	
+	/**
+	 * Returns a random integer that may be lesser or greater than the value
+	 * @param value
+	 * @return
+	 * @throws InterruptedException
+	 */
 	public int getInt(int value) throws InterruptedException{
 		Thread.currentThread().sleep(1000);
 		return ThreadLocalRandom.current().nextInt(value -3, value + 3);
 		
 	}
-	
-	 /**
-	 * 
-	 * @param ints
-	 * @return
-	 */
-	public byte[] intsToBytes(int[] ints) {
-	    ByteBuffer bb = ByteBuffer.allocate(ints.length * 4);
-	    IntBuffer ib = bb.asIntBuffer();
-	    for (int i : ints) ib.put(i);
-	    return bb.array();
-	}
-
-	/**
-	 * 
-	 * @param right
-	 * @param left
-	 * @return
-	 */
-	public byte[] createPacket(int sata){
-		
-		int[] data = new int[1];
-		data[0] = sata;
-
-		byte[] newData = intsToBytes(data);
-		
-		return newData;
-	}
-	
-	/**
-	 * 
-	 * @param sendData
-	 * @throws IOException 
-	 */
-
 	
 }

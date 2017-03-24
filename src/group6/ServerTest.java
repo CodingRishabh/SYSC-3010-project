@@ -40,8 +40,7 @@ private static final int PORT = 6777;
 	public void ServerTestConstructor() throws IOException{
 		byte[] bytes = new byte[512];
 		assertArrayEquals("both array should be equal and empty", bytes,server.getData());
-		assertEquals("Passed port should be equal to orignal port", PORT, server.getPort());
-		assertEquals("count of packets should be equal to 0", 0, server.getCount());
+	
 	}
 	
 	@Test

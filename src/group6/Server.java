@@ -32,33 +32,19 @@ import javax.swing.text.DefaultCaret;
 
 public class Server{
 	
-
-	private ArrayList<ServerThread> threadList;
-
-	
+	private ArrayList<ServerThread> threadList; // list of all the clients connected to server
 	private DatagramSocket serverSocket;
 	private byte[] receiveData;
-	
 	private static final int PORT = 6777;
-	private int count;
-	private InetAddress IPAddress;
-	private int port;
 	private DatagramPacket receivePacket;
-	private DatagramSocket clientSocket;
-
-	String message;
 
 	public Server() throws IOException{
 		this(PORT);
 	}
 	
 	public Server(int port) throws IOException{
-		this.port = port;
 		this.receiveData = new byte[512];
 		threadList = new ArrayList<ServerThread>();
-		this.count = 0;
-		clientSocket = new DatagramSocket();
-		message = "";
 		receivePacket = new DatagramPacket(receiveData, receiveData.length);	
 
 		try {
@@ -69,36 +55,16 @@ public class Server{
 		}
 	}
 	
-	
-	
-	public byte[] getData(){
-		return this.receiveData;
-	}
-	public int getPort(){
-		return this.port;
-	}
-	public int getCount(){
-		return this.count;
-	}
-	public DatagramSocket getSocket(){
-		return serverSocket;
-	}
-	public DatagramPacket getPacket(){
-		return receivePacket;
-	}
-	public String getMessage(){
-		return message;
-	}
-	
 	public void runServer() throws IOException{
 		System.out.println("\n Server is accepting connection");
 
 		while(true){
-    		
     		receivePacket = new DatagramPacket(receiveData, receiveData.length);	
 			serverSocket.receive(receivePacket);
-			String message = new String(receivePacket.getData());
+			String message = new String(receivePacket.getData()); 
 		
+			// If it is valid message then create and start server thread which will be communicating
+			//with the sensor. Server returns back to listening for other connections
 			if(processPacket(message)){
 				ServerThread t = new ServerThread(receivePacket.getPort(),receivePacket.getAddress());
 				threadList.add(t);
@@ -108,6 +74,11 @@ public class Server{
 		}
 	}
 	
+	/**
+	 * return true if the message contains "con"
+	 * @param message that needs to be verified
+	 * @return
+	 */
 	public boolean processPacket(String message){
 		return message.startsWith("con");
 	}
@@ -116,34 +87,22 @@ public class Server{
 		return threadList;
 	}
 	
-
-	
-	
-	/**
-	 * 
-	 * @param sendData
-	 * @throws IOException 
-	 */
-	public void sendPacket(byte[] sendData, int port, String ipString) throws IOException{
-		InetAddress ip = InetAddress.getByName(ipString);
-		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, ip, port);	   
-		this.clientSocket.send(sendPacket);
-	
-	}
-
 	
 	public static void main(String [] args) throws IOException {	
 	         new Server().runServer();
 	}
 	
-	public void sendTo(String host, int port, byte[] array, InetAddress ip) throws UnknownHostException, IOException{
-		DatagramSocket clientSocket = new DatagramSocket(port, ip);
-		System.out.println("Just connected to " + clientSocket.getRemoteSocketAddress());
-		//netAddress.getByName("localhost");
-		//sendPacket(array, clientSocket, port, ip);
-			
+	public byte[] getData(){
+		return this.receiveData;
 	}
 
+	public DatagramSocket getSocket(){
+		return serverSocket;
+	}
+	
+	public DatagramPacket getPacket(){
+		return receivePacket;
+	}
 	
 	/**
 	 * 
