@@ -27,6 +27,8 @@ import javax.swing.text.DefaultCaret;
 public class ServerThread extends Thread {
 	
 	public static final String  CONFIRM_REQUEST = "ok done";  
+	public static final String ANDROID_IP = "172.17.88.232";
+	public static final int ANDROID_PORT = 6799;
 	
 	private DatagramSocket socket; // Our socket that receives values
 	private int port; // port of the sensor client
@@ -101,7 +103,7 @@ public class ServerThread extends Thread {
 	    		if(client.equals("pc")){
 	    			area.append(str + " ppm \n"); 
 	    			System.out.println(client + " sensing values to android");
-	    			sendPacket(receivePacket.getData(), 6799, "172.17.88.232");// Send message to android
+	    			sendPacket(receivePacket.getData(), ANDROID_PORT, ANDROID_IP);// Send message to android
 	    		}else{
 	    			dateobj = new Date();
 	    			area.append(str + " on [ "+ df.format(dateobj) + " ]\n"); 
