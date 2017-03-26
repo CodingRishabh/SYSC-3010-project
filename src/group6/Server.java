@@ -1,35 +1,13 @@
 package group6;
-import java.awt.BorderLayout;
 
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import java.io.IOException;
-
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.text.DefaultCaret;
-
 public class Server{
 	
 	private ArrayList<ServerThread> threadList; // list of all the clients connected to server
@@ -61,12 +39,12 @@ public class Server{
 		while(true){
     		receivePacket = new DatagramPacket(receiveData, receiveData.length);	
 			serverSocket.receive(receivePacket);
-			String message = new String(receivePacket.getData()); 
+			String clientName = new String(receivePacket.getData()).trim(); 
 		
 			// If it is valid message then create and start server thread which will be communicating
 			//with the sensor. Server returns back to listening for other connections
-			if(processPacket(message)){
-				ServerThread t = new ServerThread(receivePacket.getPort(),receivePacket.getAddress());
+			if(processPacket(clientName)){
+				ServerThread t = new ServerThread(receivePacket.getPort(),receivePacket.getAddress(), clientName);
 				threadList.add(t);
 				System.out.println("\n Connected to : " + receivePacket.getPort() + receivePacket.getAddress());
 				t.start();
@@ -80,7 +58,7 @@ public class Server{
 	 * @return
 	 */
 	public boolean processPacket(String message){
-		return message.startsWith("con");
+		return message.startsWith("pc") || message.startsWith("android");
 	}
 	
 	public ArrayList<ServerThread> getThreadList(){

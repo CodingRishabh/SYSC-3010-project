@@ -1,27 +1,13 @@
 package group6;
 
-import java.io.BufferedOutputStream;
 
-import java.io.ByteArrayInputStream;
-
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.concurrent.ThreadLocalRandom;
-import java.io.OutputStream;
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -171,7 +157,7 @@ public class Test_Sensor {
 		  Test_Sensor t = new Test_Sensor();
 		  t.showSliderDemo();
 		  
-		  String conn = "con nect";
+		  String conn = "pc";
 		  System.out.println("sending a connection request" );
 		  t.sendPacket(conn.getBytes());
 		  System.out.println("Waiting for connection" );

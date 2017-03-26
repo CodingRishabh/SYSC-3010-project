@@ -1,21 +1,26 @@
 package group6;
 
 import java.awt.BorderLayout;
+
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketAddress;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.text.DefaultCaret;
 
 
@@ -28,13 +33,17 @@ public class ServerThread extends Thread {
 	private InetAddress IPAddress; // IP of the sensor client
 	private byte[] receiveData;
 	private int count; // # of packets received from sensor
+	private String client;
 	
-	private JTextField field;
+	private JLabel label;
 	private JTextArea area; // Text area where sensors values will be appended
 	private JFrame frame;
 	private JScrollPane scrollPane;
 	private JPanel textPanel, controlPanel;
-	private JButton sendToApp, sendToDatabase;
+	private DateFormat df;
+	private Date dateobj;
+	
+	
 	
 
 	/**
@@ -44,12 +53,14 @@ public class ServerThread extends Thread {
 	 * @param ip
 	 * @throws SocketException
 	 */
-	public ServerThread(int port, InetAddress ip) throws SocketException {
+	public ServerThread(int port, InetAddress ip, String client) throws SocketException {
 		this.IPAddress = ip;
 		this.port = port;
 		socket = new DatagramSocket();
 		receiveData = new byte[512];
-		initGUI();
+		this.client = client;
+		df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+		initGUI(this.client);
 		
 	}
 	
@@ -66,7 +77,7 @@ public class ServerThread extends Thread {
 		socket.send(sendPacket);
 	}
 	
-	
+	//portable wifi hotspot
 	public void run(){
 		 
 		//Before running the while loop, send a confirmation message 
@@ -79,15 +90,22 @@ public class ServerThread extends Thread {
 			 while(true){
 	        	 DatagramPacket receivePacket = new DatagramPacket(this.receiveData, this.receiveData.length);
 				 Arrays.fill(receiveData, (byte) 1 ); //clear the receiving byte array for the next message
-
+				 
 	    		 socket.receive(receivePacket);
-	    		 sendPacket(receivePacket.getData(), 6799, "172.17.88.232");// Send message to android
-
-	             System.out.println("Packet [" + this.count + "] arrived with length " + receivePacket.getData().length);
+	    		 System.out.println("Packet [" + this.count + "] arrived with length " + receivePacket.getData().length);
+	    	
 	             this.count++; // increment packet count
 	             String str = new String(receivePacket.getData()).trim();
 	             System.out.println(str);
-	    		 area.append(str + " ppm \n"); 
+	             
+	    		if(client.equals("pc")){
+	    			area.append(str + " ppm \n"); 
+	    			System.out.println(client + " sensing values to android");
+	    			sendPacket(receivePacket.getData(), 6799, "172.17.88.232");// Send message to android
+	    		}else{
+	    			dateobj = new Date();
+	    			area.append(str + " on [ "+ df.format(dateobj) + " ]\n"); 
+	    		}
 
 	            if(!socket.isBound()){ // Stop receiving values if socket is not bound
 	            	  break;
@@ -104,16 +122,22 @@ public class ServerThread extends Thread {
 	/**
 	 * Create GUI
 	 */
-	public void initGUI(){
+	public void initGUI(String client){
 		frame = new JFrame("Server");
 		frame.setSize(350,500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
 		
 		textPanel = new JPanel();
-		field = new JTextField("Values frome the sensor ");
-		frame.getContentPane().add(field, BorderLayout.NORTH) ;
-		area = new JTextArea(25,15);
+		if(client.equals("pc")){
+			label = new JLabel("SENSOR VALUES", SwingConstants.CENTER);
+			area = new JTextArea(25,15);
+		}else{
+			label = new JLabel("Ack messages from AirApp", SwingConstants.CENTER);
+			area = new JTextArea(25,30);
+		}
+		frame.getContentPane().add(label, BorderLayout.NORTH) ;
+		
 	
 		DefaultCaret caret = (DefaultCaret) area.getCaret(); 
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);      
