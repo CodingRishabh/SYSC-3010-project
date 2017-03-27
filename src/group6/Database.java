@@ -1,11 +1,13 @@
+/**
+ * https://github.com/rishsingh/SYSC-3010-project
+ * Mar 26, 2017
+ * version 3.0
+ */
 package group6;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,18 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Scanner;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import java.sql.ResultSet;
 
 public class Database {
@@ -36,7 +27,6 @@ public class Database {
 	private DatagramPacket receivePacket;
 	private DatagramSocket dataSocket;
 	private byte[] receiveData;
-	private int count;
 	private int port;
 	
 	public Database(int port) throws IOException{
@@ -61,8 +51,6 @@ public class Database {
     public Connection connect() throws IOException  {
         Connection conn = null;
         try {
-            // database parameters
-            this.url = url;
             // create a connection to the database
             conn = DriverManager.getConnection(url);
             System.out.println("Connection to SQLite has been established.");
@@ -162,5 +150,3 @@ public class Database {
 		return time;
 	}
 }
-
-
