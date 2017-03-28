@@ -30,10 +30,14 @@ public class ServerThread extends Thread {
 	public static final String ANDROID_IP = "172.17.88.232";
 	public static final int ANDROID_PORT = 6799;
 	
+	//public static final String DATABASE_IP = XXXXXX;
+	//public static final int DATABASE_PORT = XXXXX;
+	
 	private DatagramSocket socket; // Our socket that receives values
 	private int port; // port of the sensor client
 	private InetAddress IPAddress; // IP of the sensor client
 	private byte[] receiveData;
+	
 	private int count; // # of packets received from sensor
 	private String client;
 	
@@ -60,6 +64,7 @@ public class ServerThread extends Thread {
 		this.port = port;
 		socket = new DatagramSocket();
 		receiveData = new byte[512];
+	
 		this.client = client;
 		df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
 		initGUI(this.client);
@@ -90,23 +95,35 @@ public class ServerThread extends Thread {
 			
 			// Start receiving values from the sensor
 			 while(true){
-	        	 DatagramPacket receivePacket = new DatagramPacket(this.receiveData, this.receiveData.length);
+				 DatagramPacket receivePacket = new DatagramPacket(this.receiveData, this.receiveData.length);
 				 Arrays.fill(receiveData, (byte) 1 ); //clear the receiving byte array for the next message
+    			 socket.receive(receivePacket);
+	    		 
 				 
-	    		 socket.receive(receivePacket);
-	    		 System.out.println("Packet [" + this.count + "] arrived with length " + receivePacket.getData().length);
-	    	
-	             this.count++; // increment packet count
-	             String str = new String(receivePacket.getData()).trim();
-	             System.out.println(str);
-	             
+    			// Execute the right code based on who is the client thread communicating with us
 	    		if(client.equals("pc")){
+	    			 System.out.println("Packet [" + this.count + "] arrived with length " + receivePacket.getData().length);
+		             this.count++; // increment packet count
+		             String str = new String(receivePacket.getData()).trim();
+		             System.out.println(str);
+		             
 	    			area.append(str + " ppm \n"); 
 	    			System.out.println(client + " sensing values to android");
 	    			sendPacket(receivePacket.getData(), ANDROID_PORT, ANDROID_IP);// Send message to android
-	    		}else{
-	    			dateobj = new Date();
-	    			area.append(str + " on [ "+ df.format(dateobj) + " ]\n"); 
+	    			
+	    		}else if (client.equals("android")){
+		             String str = new String(receivePacket.getData()).trim();
+	    			 dateobj = new Date();
+	    			 String currentTime = df.format(dateobj);
+	    			 area.append(str + " on [ "+ currentTime + " ]\n"); 
+	    			 
+	    			 //String databaseMessage = str + "," + currentTime;
+	    			 //byte[] databaseData = databaseMessage.getBytes();
+	    			 //sendPacket(databaseData, DATABASE_PORT, DATABASE_IP);
+	    			 
+	    			 // when message arrives to the database, extract data from packet -> convert it to string, parse it by delimeter "," and
+	    			 // add it to the database. Have database listening at all times
+
 	    		}
 
 	            if(!socket.isBound()){ // Stop receiving values if socket is not bound
@@ -146,10 +163,8 @@ public class ServerThread extends Thread {
 
 		scrollPane = new JScrollPane(area);
 		scrollPane.setViewportView(area);
-		
 		textPanel.add(scrollPane);
-		frame.getContentPane().add(textPanel, BorderLayout.CENTER) ;
-		
+		frame.getContentPane().add(textPanel, BorderLayout.CENTER) ;	
 		controlPanel = new JPanel();
 		frame.getContentPane().add(controlPanel, BorderLayout.SOUTH) ;
 		frame.setVisible(true);
