@@ -8,6 +8,11 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+/**
+ * 
+ * @author Rishabh Singh
+ *
+ */
 public class Server{
 	
 	private ArrayList<ServerThread> threadList; // list of all the clients connected to server

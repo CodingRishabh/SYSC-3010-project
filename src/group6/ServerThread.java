@@ -23,7 +23,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.text.DefaultCaret;
 
-
+/**
+ * 
+ * @author Rishabh Singh
+ *
+ */
 public class ServerThread extends Thread {
 	
 	public static final String  CONFIRM_REQUEST = "ok done";  

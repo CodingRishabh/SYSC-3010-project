@@ -13,7 +13,11 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
-
+/**
+ * 
+ * @author Rishabh Singh
+ *
+ */
 public class Test_Sensor {
 	
 	private JFrame mainFrame;
