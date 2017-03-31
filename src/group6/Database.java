@@ -20,10 +20,10 @@ import java.sql.ResultSet;
 
 public class Database {
 
-	private static final int PORT = 2047;
+	private static final int PORT = 2046;
 	private static int value;
 	private String time;
-	static String url="jdbc:sqlite:C:/Users/Pallavi Singh/git/SYSC-3010-project/AirQ.db";
+	static String url="jdbc:sqlite:C:/Users/Pallavi Singh/git/SYSC-3010-project/SYSC-3010-project/AirQ.db";
 	private DatagramPacket receivePacket;
 	private DatagramSocket dataSocket;
 	private byte[] receiveData;
@@ -35,7 +35,6 @@ public class Database {
 		try {
 			dataSocket = new DatagramSocket(port);
 		} catch (SocketException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	  }
@@ -54,10 +53,10 @@ public class Database {
             // create a connection to the database
             conn = DriverManager.getConnection(url);
             System.out.println("Connection to SQLite has been established.");
-            run();
+           // run();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
+        }/** finally {
             try {
                if (conn != null) {
                     conn.close();
@@ -65,7 +64,7 @@ public class Database {
             } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
-        }
+        }*/
 		return conn;
     }
     /**
@@ -124,8 +123,13 @@ public class Database {
 			dataSocket.receive(receivePacket);
             String str = new String(receivePacket.getData()).trim();
             System.out.println(str);
-            value=Integer.parseInt(str.toString()); 
-            time=CurrentTime();
+            String delims = ",";
+            String[] tokens = str.split(delims);
+            //value=Integer.parseInt(str.toString()); 
+            //time=CurrentTime();
+            value=Integer.parseInt(tokens[0].toString());
+            time=tokens[1];
+            System.out.println("value= "+value+"   time= "+time);
             insert(value, time);
           if(!dataSocket.isBound()){
 			  Connection conn = this.connect();
@@ -141,7 +145,7 @@ public class Database {
         }
 	    dataSocket.close();
     }
-	
+	//TODO remove method CurrentTime()
 	private String CurrentTime(){
 		DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
 	    Date dateobj = new Date();
