@@ -21,7 +21,7 @@ import java.sql.ResultSet;
 public class Database {
 
 	private static final int PORT = 2046;
-	private static int value;
+	private static String value;
 	private String time;
 	static String url="jdbc:sqlite:C:/Users/Pallavi Singh/git/SYSC-3010-project/SYSC-3010-project/AirQ.db";
 	private DatagramPacket receivePacket;
@@ -41,8 +41,18 @@ public class Database {
 	
     public static void main(String[] args) throws Exception{
     	 Database d = new Database(PORT);
+    	 d.end();
     	 d.connect();
-    	 //d.display();  
+    	 d.run();
+    	 d.display();  
+    }
+    private void end(){
+    	try {
+			Connection conn = DriverManager.getConnection(url);
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
 	/**
 	 * Connecting to the database AirQ.db
@@ -53,10 +63,9 @@ public class Database {
             // create a connection to the database
             conn = DriverManager.getConnection(url);
             System.out.println("Connection to SQLite has been established.");
-           // run();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }/** finally {
+        } /**finally {
             try {
                if (conn != null) {
                     conn.close();
@@ -72,7 +81,7 @@ public class Database {
      * @param value- reading from the sensor
      * @param time- time at which the sensor value is recorded
      */
-    public void insert(int value, String time) throws IOException {
+    public void insert(String value, String time) throws IOException {
     	this.value=value;
     	this.time=time;
         String sql = "INSERT INTO SensorData(value,time) VALUES(?,?)";
@@ -81,7 +90,7 @@ public class Database {
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
         	System.out.println("value inserted");
             // set the corresponding param
-        	pstmt.setInt(1, value);
+        	pstmt.setString(1, value);
             pstmt.setString(2, time);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -127,7 +136,7 @@ public class Database {
             String[] tokens = str.split(delims);
             //value=Integer.parseInt(str.toString()); 
             //time=CurrentTime();
-            value=Integer.parseInt(tokens[0].toString());
+            value=tokens[0];
             time=tokens[1];
             System.out.println("value= "+value+"   time= "+time);
             insert(value, time);
