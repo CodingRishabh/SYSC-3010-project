@@ -55,27 +55,10 @@ private static final int PORT = 6777;
 		//server.runServer();
 		Test_Sensor t = new Test_Sensor();
 		t.sendPacket(s.getBytes());
-		
-		assertEquals("check if server thread was created", 1, server.getThreadList().size() );
-		
+		assertEquals("check if server thread was created", 1, server.getThreadList().size() );	
 	}
 
 
-	@Test
-	public void TestbytesToInts() {
-	
-		byte[] bytes = new byte[0];
-		int[] ints = new int[0];
-		
-
-		assertArrayEquals("Bytes array should be converted to int array.",ints, server.bytesToInts(bytes));
-	}
-	@Test
-	public void TestIntsToBytes() {
-		byte[] bytes = new byte[0];
-		int[] ints = new int[0];
-		assertArrayEquals("Ints array should be converted to bytes array.",bytes, server.intsToBytes(ints));
-	}
 
 	@Test
 	public void TestSendPacket() throws IOException {

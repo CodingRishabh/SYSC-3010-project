@@ -25,7 +25,7 @@ public class Test_Sensor {
 	private JLabel statusLabel;
 	private JPanel controlPanel;
 	private JSlider slider;
-	private int sliderValue = 400; //display slider value on GUI
+	private int sliderValue = 100; //display slider value on GUI
 	
 	private static final int PORT = 6777;// port of the server
 	private DatagramSocket clientSocket;// our socket
@@ -40,12 +40,7 @@ public class Test_Sensor {
 	 * @throws IOException
 	 */
 	public Test_Sensor() throws IOException{
-		//clientSocket = new Socket("172.17.43.32", port);
-		//clientSocket = new Socket("172.17.67.5", port);
-		//clientSocket = new Socket("localhost", PORT);
-		//old phone 127.17.88.251
-		//good phone 172.17.48.38
-		//use broad cast ip in computer lab linux machine not ethernet ip
+
 		System.out.println("Connecting to " + "localhost" + " on port " + PORT);
 		try {
 			clientSocket = new DatagramSocket();
@@ -96,7 +91,7 @@ public class Test_Sensor {
 		 * Create a JSlider that ranges from 0 - 1000
 		 */
 	   private void showSliderDemo(){
-	      slider = new JSlider(JSlider.HORIZONTAL,0,1000,400);;
+	      slider = new JSlider(JSlider.HORIZONTAL,0,1000,100);;
 	      slider.setSize(20,10);
 	      
 	      slider.setMinorTickSpacing(100);

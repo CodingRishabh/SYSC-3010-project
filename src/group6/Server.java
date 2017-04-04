@@ -88,44 +88,4 @@ public class Server{
 		return receivePacket;
 	}
 	
-	/**
-	 * 
-	 * @param bytes
-	 * @return
-	 */
-	public  static int[] bytesToInts(byte[] bytes) {
-	    int[] ints = new int[bytes.length / 4];
-	    ByteBuffer.wrap(bytes).asIntBuffer().get(ints);
-	    return ints;
-	}
-	
-	/**
-	 * 
-	 * @param ints
-	 * @return
-	 */
-	public byte[] intsToBytes(int[] ints) {
-	    ByteBuffer bb = ByteBuffer.allocate(ints.length * 4);
-	    IntBuffer ib = bb.asIntBuffer();
-	    for (int i : ints) ib.put(i);
-	    return bb.array();
-	}
-
-	/**
-	 * 
-	 * @param right
-	 * @param left
-	 * @return
-	 */
-	/*
-	public byte[] createPacket(int sata){
-		
-		int[] data = new int[1];
-		data[0] = sata;
-
-		byte[] newData = intsToBytes(data);
-		
-		return newData;
-	}
-	*/
 }

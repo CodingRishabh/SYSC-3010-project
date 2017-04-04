@@ -36,11 +36,11 @@ import javax.swing.text.DefaultCaret;
 public class ServerThread extends Thread {
 	
 	public static final String  CONFIRM_REQUEST = "ok done";  
-	private String Android_IP = "172.17.76.204";
+	private String Android_IP = "172.17.91.121";
 	public static final int ANDROID_PORT = 6799;
-	
-	//public static final String DATABASE_IP = XXXXXX;
-	//public static final int DATABASE_PORT = XXXXX;
+	public static final String DATABASE_IP = "192.168.43.26";
+	public static final int DATABASE_PORT = 2046;
+	private final int THRESHOLD=250;
 	
 	private DatagramSocket socket; // Our socket that receives values
 	private int port; // port of the sensor client
@@ -118,6 +118,19 @@ public class ServerThread extends Thread {
 		             
 	    			area.append(str + " ppm \n"); 
 	    			sendPacket(receivePacket.getData(),ANDROID_PORT, Android_IP);// Send message to android
+
+	    			 String str1 = new String(receivePacket.getData()).trim();
+	    			 dateobj = new Date();
+	    			 String currentTime = df.format(dateobj);
+	    			 int value=Integer.parseInt(str1);
+	    			 //send sensor value to the database if the value is greater than the threshold
+	    			if(value>THRESHOLD){
+	    				
+	    				String databaseMessage = str1 + "," + currentTime;
+	    				byte[] databaseData = databaseMessage.getBytes();
+	    				sendPacket(databaseData, DATABASE_PORT, DATABASE_IP);
+	    				System.out.println("sent " + databaseMessage + " to database");
+	    			}
 	    			
 	    		}else if (client.equals("android")){
 	    			 DatagramPacket receivePacket = new DatagramPacket(this.receiveData, this.receiveData.length);
@@ -127,7 +140,12 @@ public class ServerThread extends Thread {
 		             String str = new String(receivePacket.getData()).trim();
 	    			 dateobj = new Date();
 	    			 String currentTime = df.format(dateobj);
-	    			 area.append(str + " on [ "+ currentTime + " ]\n"); 
+	    			 
+	    			 area.append(str + " on [ "+ currentTime + " ]\n");
+	    			 
+	    			 String databaseMessage = str + "," + currentTime;
+	    			 byte[] databaseData = databaseMessage.getBytes();
+	    			 sendPacket(databaseData, DATABASE_PORT, DATABASE_IP);
 	    			 
 	    			 //String databaseMessage = str + "," + currentTime;
 	    			 //byte[] databaseData = databaseMessage.getBytes();
