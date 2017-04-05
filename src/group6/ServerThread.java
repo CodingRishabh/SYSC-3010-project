@@ -3,6 +3,7 @@ package group6;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.text.DateFormat;
@@ -36,10 +38,10 @@ import javax.swing.text.DefaultCaret;
 public class ServerThread extends Thread {
 	
 	public static final String  CONFIRM_REQUEST = "ok done";  
-	private String Android_IP = "172.17.91.121";
+	private String Android_IP = "192.168.43.48";
 	public static final int ANDROID_PORT = 6799;
-	public static final String DATABASE_IP = "192.168.43.26";
-	public static final int DATABASE_PORT = 2046;
+	public String Database_IP = "10.0.0.62";
+	public static final int DATABASE_PORT = 2050;
 	private final int THRESHOLD=250;
 	
 	private DatagramSocket socket; // Our socket that receives values
@@ -57,6 +59,8 @@ public class ServerThread extends Thread {
 	private JPanel textPanel, container1;
 	private JTextField ipField;
 	private JButton changeIP;
+	private JTextField ipFieldDB;
+	private JButton changeIPDB;
 	private DateFormat df;
 	private Date dateobj;
 	
@@ -66,8 +70,10 @@ public class ServerThread extends Thread {
 	 * @param port
 	 * @param ip
 	 * @throws SocketException
+	 * @throws UnknownHostException 
+	 * @throws HeadlessException 
 	 */
-	public ServerThread(int port, InetAddress ip, String client) throws SocketException {
+	public ServerThread(int port, InetAddress ip, String client) throws SocketException, HeadlessException, UnknownHostException {
 		this.IPAddress = ip;
 		this.port = port;
 		socket = new DatagramSocket();
@@ -128,7 +134,7 @@ public class ServerThread extends Thread {
 	    				
 	    				String databaseMessage = str1 + "," + currentTime;
 	    				byte[] databaseData = databaseMessage.getBytes();
-	    				sendPacket(databaseData, DATABASE_PORT, DATABASE_IP);
+	    				sendPacket(databaseData, DATABASE_PORT, Database_IP);
 	    				System.out.println("sent " + databaseMessage + " to database");
 	    			}
 	    			
@@ -145,14 +151,8 @@ public class ServerThread extends Thread {
 	    			 
 	    			 String databaseMessage = str + "," + currentTime;
 	    			 byte[] databaseData = databaseMessage.getBytes();
-	    			 sendPacket(databaseData, DATABASE_PORT, DATABASE_IP);
+	    			 sendPacket(databaseData, DATABASE_PORT, Database_IP);
 	    			 
-	    			 //String databaseMessage = str + "," + currentTime;
-	    			 //byte[] databaseData = databaseMessage.getBytes();
-	    			 //sendPacket(databaseData, DATABASE_PORT, DATABASE_IP);
-	    			 
-	    			 // when message arrives to the database, extract data from packet -> convert it to string, parse it by delimeter "," and
-	    			 // add it to the database. Have database listening at all times
 
 	    		}
 
@@ -170,14 +170,16 @@ public class ServerThread extends Thread {
 
 	/**
 	 * Create GUI
+	 * @throws UnknownHostException 
+	 * @throws HeadlessException 
 	 */
-	public void initGUI(String client){
-		frame = new JFrame("Server");
-		frame.setSize(350,500);
+	public void initGUI(String client) throws HeadlessException, UnknownHostException{
+		frame = new JFrame("Server IP: " + InetAddress.getLocalHost().toString());
+		frame.setSize(420,500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
 		container1 = new JPanel();
-		container1.setLayout(new GridLayout(2,3));
+		container1.setLayout(new GridLayout(4,3));
 		
 		
 		textPanel = new JPanel();
@@ -190,7 +192,6 @@ public class ServerThread extends Thread {
 			changeIP.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					String input = ipField.getText() ;
-
 				    if(validIP(input)){
 				    	Android_IP = input;
 				    }else{
@@ -198,12 +199,32 @@ public class ServerThread extends Thread {
 				    }
 					
 				  }
-				
 			});
-			container1.add(new JLabel("Change IP"));
+			ipFieldDB = new JTextField("Enter IP here", SwingConstants.CENTER);
+			changeIPDB = new JButton("Set destination IP");
+			changeIPDB.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String input = ipFieldDB.getText() ;
+				    if(validIP(input)){
+				    	Database_IP = input;
+				    }else{
+				    	JOptionPane.showMessageDialog(frame, "Invalid IP");
+				    }
+					
+				  }
+			});
+			
+			
+			container1.add(new JLabel("Change IP for Android"));
 			container1.add(ipField) ;
-			container1.add(Box.createRigidArea(new Dimension(5,0)));
+			container1.add(Box.createRigidArea(new Dimension(4,0)));
 			container1.add(changeIP) ;
+
+			container1.add(new JLabel("Change IP for Database"));
+			container1.add(ipFieldDB) ;
+			container1.add(Box.createRigidArea(new Dimension(4,0)));
+			container1.add(changeIPDB) ;
+			
 			frame.getContentPane().add(container1, BorderLayout.SOUTH);
 			
 		}else{
