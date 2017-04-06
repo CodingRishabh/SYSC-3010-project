@@ -1,5 +1,6 @@
 /**
  * https://github.com/rishsingh/SYSC-3010-project
+
  * Mar 26, 2017
  * version 3.0
  */
@@ -74,7 +75,7 @@ public class Database {
      * @param time- time at which the sensor value is recorded
      */
     public void insert(int value, String time) throws IOException {
-    	this.value=value;
+    	Database.value=value;
     	this.time=time;
         String sql = "INSERT INTO SensorData(value,time) VALUES(?,?)";
         System.out.println("inserting value: " +value);

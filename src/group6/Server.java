@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 /**
  * 
  * @author Rishabh Singh
@@ -19,7 +16,7 @@ public class Server{
 	private ArrayList<ServerThread> threadList; // list of all the clients connected to server
 	private DatagramSocket serverSocket;
 	private byte[] receiveData;
-	private static final int PORT = 6777;
+	public static final int PORT = 6777;
 	private DatagramPacket receivePacket;
 
 	public Server() throws IOException{

@@ -13,7 +13,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -38,7 +37,7 @@ import javax.swing.text.DefaultCaret;
 public class ServerThread extends Thread {
 	
 	public static final String  CONFIRM_REQUEST = "ok done";  
-	private String Android_IP = "192.168.43.48";
+	private String Android_IP = "172.17.66.12";
 	public static final int ANDROID_PORT = 6799;
 	public String Database_IP = "10.0.0.62";
 	public static final int DATABASE_PORT = 2050;
@@ -99,6 +98,7 @@ public class ServerThread extends Thread {
 	}
 	
 	//portable wifi hotspot
+	@Override
 	public void run(){
 		 
 		//Before running the while loop, send a confirmation message 
@@ -175,7 +175,7 @@ public class ServerThread extends Thread {
 	 */
 	public void initGUI(String client) throws HeadlessException, UnknownHostException{
 		frame = new JFrame("Server IP: " + InetAddress.getLocalHost().toString());
-		frame.setSize(420,500);
+		frame.setSize(420,600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
 		container1 = new JPanel();
@@ -190,6 +190,7 @@ public class ServerThread extends Thread {
 			ipField = new JTextField("Enter IP here", SwingConstants.CENTER);
 			changeIP = new JButton("Set destination IP");
 			changeIP.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					String input = ipField.getText() ;
 				    if(validIP(input)){
@@ -203,6 +204,7 @@ public class ServerThread extends Thread {
 			ipFieldDB = new JTextField("Enter IP here", SwingConstants.CENTER);
 			changeIPDB = new JButton("Set destination IP");
 			changeIPDB.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					String input = ipFieldDB.getText() ;
 				    if(validIP(input)){
@@ -271,6 +273,14 @@ public class ServerThread extends Thread {
 	    } catch (NumberFormatException nfe) {
 	        return false;
 	    }
+	}
+	
+	public InetAddress getIP(){
+		return IPAddress;
+	}
+	
+	public String getClient(){
+		return client;
 	}
 
 	

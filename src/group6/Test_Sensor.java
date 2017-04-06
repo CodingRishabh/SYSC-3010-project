@@ -67,14 +67,15 @@ public class Test_Sensor {
 	      mainFrame.setLayout(new GridLayout(5, 1));
 	      
 	      mainFrame.addWindowListener(new WindowAdapter() {
-	         public void windowClosing(WindowEvent windowEvent){
+	         @Override
+			public void windowClosing(WindowEvent windowEvent){
 	            System.exit(0);
 	         }        
 	      });
 	      
 	            
-	      headerLabel = new JLabel("CO2 Concentration in (ppm)", JLabel.CENTER);        
-	      statusLabel = new JLabel("Value : " + sliderValue,JLabel.CENTER);    
+	      headerLabel = new JLabel("CO2 Concentration in (ppm)", SwingConstants.CENTER);        
+	      statusLabel = new JLabel("Value : " + sliderValue,SwingConstants.CENTER);    
 	      statusLabel.setSize(350,300);
 
 	      controlPanel = new JPanel();
@@ -91,7 +92,7 @@ public class Test_Sensor {
 		 * Create a JSlider that ranges from 0 - 1000
 		 */
 	   private void showSliderDemo(){
-	      slider = new JSlider(JSlider.HORIZONTAL,0,1000,100);;
+	      slider = new JSlider(SwingConstants.HORIZONTAL,0,1000,100);;
 	      slider.setSize(20,10);
 	      
 	      slider.setMinorTickSpacing(100);
@@ -104,7 +105,8 @@ public class Test_Sensor {
 	      
 	      
 	      slider.addChangeListener(new ChangeListener() {
-	         public void stateChanged(ChangeEvent e) {
+	         @Override
+			public void stateChanged(ChangeEvent e) {
 	        	sliderValue = ((JSlider)e.getSource()).getValue();
 	            statusLabel.setText("Value : " + sliderValue); // match the slider label with current slider value
 	   
@@ -188,7 +190,8 @@ public class Test_Sensor {
 	 * @throws InterruptedException
 	 */
 	public int getInt(int value) throws InterruptedException{
-		Thread.currentThread().sleep(1000);
+		Thread.currentThread();
+		Thread.sleep(1000);
 		return ThreadLocalRandom.current().nextInt(value -3, value + 3);
 		
 	}
